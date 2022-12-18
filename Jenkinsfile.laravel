@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Source Code') {
+            steps {
+                git branch: 'master', url: 'https://github.com/williamsbdev/laravel-hello-world.git'
+            }
+        }
+        stage('Composer Install') {
+            steps {
+                sh 'composer update'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                sh 'zip -r archive-build-${BUILD_NUMBER}.zip ./'
+                archiveArtifacts artifacts: 'archive-*.zip', followSymlinks: false
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'cp -v archive-build-* ~/'
+            }
+        }
+    }
+}
